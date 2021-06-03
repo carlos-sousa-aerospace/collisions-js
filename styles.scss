@@ -1,0 +1,194 @@
+@font-face {
+    font-family: "poppins";
+    src: url("./fonts/Poppins/Poppins-Regular.ttf") format("truetype");
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: "poppins";
+    src: url("./fonts/Poppins/Poppins-Bold.ttf") format("truetype");
+    font-weight: bold;
+}
+
+:root {
+    --top-margin: 50px;
+    --lrb-margin: 2.5vw;
+    --container-width: calc(100vw - 2 * var(--lrb-margin));
+    --container-height: calc(100vh - var(--top-margin) - var(--lrb-margin));
+    --canvas-width: 50px; // Managed with javascript
+    --canvas-height: 50px; // Managed with javascript
+}
+
+$main-color: #0095DD;
+$border-color: 1px solid $main-color;
+
+@mixin regular-font ($size: 14pt, $weight: normal) {
+    font-family: "poppins";
+    font-weight: $weight;
+    font-size: $size;
+}
+
+*,
+*:before,
+*:after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.title {
+    height: var(--top-margin);
+    line-height: var(--top-margin);
+    text-align: center;
+    @include regular-font($weight: bold);
+    text-transform: uppercase;
+}
+
+#container {
+    display: grid;
+    width: var(--container-width);
+    height: var(--container-height);
+    gap: 0;
+    margin: 0 auto;
+    grid-template-columns: auto var(--canvas-width);
+    grid-template-rows: auto 1fr auto;
+    border: $border-color;
+    overflow: hidden;
+
+    & > * {
+        @include regular-font;
+    }
+}
+
+#coordinates {
+    grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-around;
+    width: 100%;
+    height: 35px;
+    padding-left: 10px;
+    line-height: 35px;
+    
+    div {
+        display: inline-block;
+        width: 80px;
+    }
+}
+
+#messages {
+    grid-column: 1;
+    grid-row: 2;
+    width: 100%;
+    border-top: $border-color;
+    overflow: auto;
+}
+
+#reset {
+    grid-column: 1;
+    grid-row: 3;
+    position: relative;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    text-decoration: none;
+    border-radius: 0.2em;
+    height: 50px;
+    padding: 0;
+    margin: 10px;
+    color: $main-color;
+    background-color: white;
+    border: $border-color;
+    outline: none;
+    cursor: pointer;
+    font-weight: bold;
+    overflow: hidden;
+
+    &:before {
+        content: '';
+        display: block;
+        position: absolute;
+        top: -10px;
+        left: 0;
+        width: 30px;
+        height: 70px;
+        background-color: rgba(255, 255, 255, 0.5);
+        opacity: 0.5;
+        filter: blur(30px);
+        transform: translateX(-100px) skewX(-15deg);
+    }
+
+    &:after {
+        content: '';
+        display: block;
+        position: absolute;
+        top: -10px;
+        left: 20px;
+        width: 30px;
+        height: 70px;
+        background-color: rgba(255, 255, 255, 0.4);
+        opacity: 0;
+        filter: blur(8px);
+        transform: translateX(-100px) skewX(-15deg);
+    }
+
+    &:hover {
+        color: white;
+        background-color: scale-color($main-color, $lightness: 10%);
+        transition: color 0.6s, background-color 0.6s, transform 0.1s ease-out;
+
+        &:before {
+            transform: translateX(25vw) skewX(-15deg);
+            opacity: 0.6;
+            transition: all 0.8s;
+        }
+
+        &:after {
+            transform: translateX(25vw) skewX(-15deg);
+            opacity: 1;
+            transition: all 0.8s;
+        }
+    }
+
+    &:focus {
+        outline: none;
+    }
+
+    &:active {
+        transform: scale(0.99);
+    }
+    
+}
+
+#shape-collisions {
+    padding: 10px;
+
+    h1 {
+        font-family: "poppins";
+        font-weight: normal;
+        font-size: 14pt;
+        font-weight: bold;
+    }
+
+    .svg-icon {
+        display: flex;
+        margin: 5px 0;
+        flex-flow: row wrap;
+        justify-content: start;
+        align-items: stretch;
+    
+        svg {
+            padding: 0 5px;
+        }
+    }
+}
+
+#canvas {
+    box-sizing: content-box;
+    grid-column: 2;
+    grid-row: 1 / span 3;
+    width: var(--canvas-width);
+    height: var(--canvas-height);
+    background-color: #F8F8F8;
+    border-left: $border-color;
+}
