@@ -16,14 +16,34 @@ export class Circle extends Shape {
         return this.centroid; // Centroid is at the coordinate (0,0) of any regular polygon
     }
 
+    xmax() {
+        return this.radius;
+    }
+
+    xmin() {
+        return this.radius;
+    }
+
+    ymax() {
+        return this.radius;
+    }
+
+    ymin() {
+        return this.radius;
+    }
+
     translate(tVector) {
         // Translate centroid of shape (center of hit region)
         this.centroid[0] += tVector[0];
         this.centroid[1] += tVector[1];
     }
 
-    reset() {
-        this.centroid = [0, 0];
+    translateX(x) {
+        this.centroid[0] += x;
+    }
+
+    translateY(y) {
+        this.centroid[1] += y;
     }
 
     projectPolygon(nx, ny) {
@@ -125,7 +145,7 @@ export class Circle extends Shape {
     // Overide
     createSVGShapeProfile() {
         // Generates an SVG icon to display inside the messages div
-        const box = [26, 26]; // Width and Height of the svg box
+        const box = [28, 28]; // Width and Height of the svg box
         const svgNode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         svgNode.setAttributeNS(null, "viewBox", `0 0 ${box[0]} ${box[1]}`);
         svgNode.setAttributeNS(null, "width", box[0]);
@@ -141,7 +161,7 @@ export class Circle extends Shape {
         const shapeNode = document.createElementNS("http://www.w3.org/2000/svg", "circle");
 
         // Scale the coordinates and then join
-        const scale = 0.16;
+        const scale = 0.18;
         shapeNode.setAttributeNS(null, "cx", box[0] / 2);
         shapeNode.setAttributeNS(null, "cy", box[1] / 2);
         shapeNode.setAttributeNS(null, "r", scale * this.radius);

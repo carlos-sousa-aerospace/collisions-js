@@ -2,8 +2,7 @@ import { Shape } from "./Shape.js";
 
 export class CanvasDrag {
     constructor(canvas, shapesArray) {
-        this.origShapesArray = shapesArray; // Immutable
-        this.shapesArray = [...shapesArray];
+        this.shapesArray = [...shapesArray]; // Shallow copy
 
         const bb = canvas.getBoundingClientRect();
         this.offsetX = bb.left;
@@ -27,8 +26,8 @@ export class CanvasDrag {
     initCollisionLists() {
         const len = this.shapesArray.length;
         for (let i = 0, ilen = len - 1; i < ilen; i++) {
+            const a = this.shapesArray[i];
             for (let j = i + 1; j < len; j++) {
-                const a = this.shapesArray[i];
                 const b = this.shapesArray[j];
                 if (a.isColliding(b) && !a.collisionList.includes(b)) {
                     a.collisionList.push(b);
@@ -51,6 +50,11 @@ export class CanvasDrag {
                 shape.svgArray[0].style.display = "initial";
                 shape.svgArray[1].style.display = "initial";
                 shape.svgRoot.style.display = "block";
+
+                if (shape.collisionList.length === 1) {
+                    const tvec = shape.isColliding(shape.collisionList[0]);
+                    shape.translateMTV(tvec);
+                }
             }
             else {
                 if (shape.strokeStyle === Shape.collisionStrokeStyle) {
@@ -64,8 +68,8 @@ export class CanvasDrag {
         });
     }
 
-    reset() {
-        this.shapesArray = [...this.origShapesArray];
+    reset(shapesArray) {
+        this.shapesArray = [...shapesArray]; // Shallow copy
         const bb = canvas.getBoundingClientRect();
         this.offsetX = bb.left;
         this.offsetY = bb.top;
@@ -73,11 +77,7 @@ export class CanvasDrag {
         this.activeShape = null;
 
         // Reset collision lists and SVG Collision Nodes
-        this.shapesArray.forEach( shape => {
-            shape.collisionList = [];
-            shape.svgArray.forEach( svg => svg.style.display = "none" );
-            shape.svgRoot.style.display = "none";
-        });
+        this.shapesArray.forEach( shape => shape.reset() );
 
         this.initCollisionLists();
     }

@@ -15,9 +15,7 @@ export class Shape {
 
     constructor(vertices = null) {
         if (vertices && Array.isArray(vertices)) {
-            this.origVertices = vertices; // Immutable: for reseting the shape
-
-            this.vertices = vertices.map( vertex => vertex.slice(0) ); // deep clone of input array
+            this.vertices = vertices
             this.vertexCount = vertices.length; // Number of distinct vertices of polygon
 
             // Needed for circular loops
@@ -26,8 +24,7 @@ export class Shape {
             this.vertices.push(this.vertices[0]);
 
             // Centroid of hit circular region for canvas dragging
-            this.origCentroid = this.getCentroid(); // Immutable: for reseting the shape
-            this.centroid = [...this.origCentroid];
+            this.centroid = this.getCentroid();
         }
         else {
             // Represents a curved shape with no vertices (no cusps)
@@ -57,8 +54,6 @@ export class Shape {
 
         // The MTV Shape properties
         this.mtvVertices = [];
-        this.mtvCentroid = [];
-        this.mtvTVecList = [];
 
         // Style properties
         this.strokeStyle = Shape.regularStrokeStyle;
@@ -109,6 +104,30 @@ export class Shape {
         return [x, y];
     }
 
+    xmax() {
+        // Return value is positive and calculated with respect to the shape's centroid
+        const va = this.vertexArray;
+        return Math.abs(va.reduce((a, b) => Math.max(a, b[0]), va[0][0]) - this.centroid[0]);
+    }
+
+    xmin() {
+        // Return value is positive and calculated with respect to the shape's centroid
+        const va = this.vertexArray;
+        return Math.abs(va.reduce((a, b) => Math.min(a, b[0]), va[0][0]) - this.centroid[0]);
+    }
+
+    ymax() {
+        // Return value is positive and calculated with respect to the shape's centroid
+        const va = this.vertexArray;
+        return Math.abs(va.reduce((a, b) => Math.max(a, b[1]), va[0][1]) - this.centroid[1]);
+    }
+
+    ymin() {
+        // Return value is positive and calculated with respect to the shape's centroid
+        const va = this.vertexArray;
+        return Math.abs(va.reduce((a, b) => Math.min(a, b[1]), va[0][1]) - this.centroid[1]);
+    }
+
     translate(tVector) {
         // Note that this loop changes the last element of this.vertices
         // at index i = this.vertexCount because it was copied by reference
@@ -122,11 +141,23 @@ export class Shape {
         this.centroid[1] += tVector[1];
     }
 
+    translateX(x) {
+        for (let i = 0; i < this.vertexCount; i++) {
+            this.vertices[i][0] += x;
+        }
+    }
+
+    translateY(y) {
+        for (let i = 0; i < this.vertexCount; i++) {
+            this.vertices[i][1] += y;
+        }
+    }
+
     reset() {
-        this.vertices = this.origVertices.map( vertex => vertex.slice(0) );
-        this.vertexCount = this.origVertices.length;
-        this.vertices.push(this.vertices[0]);
-        this.centroid = [...this.origCentroid];
+        this.collisionList = [];
+        this.svgArray.forEach( svg => svg.style.display = "none" );
+        this.svgRoot.style.display = "none";
+        this.mtvVertices = [];
     }
 
     hitTest(x, y) {
@@ -183,7 +214,7 @@ export class Shape {
 
     createSVGShapeProfile() {
         // Generates an SVG icon to display inside the messages div
-        const box = [26, 26]; // Width and Height of the svg box
+        const box = [28, 28]; // Width and Height of the svg box
         const svgNode = document.createElementNS("http://www.w3.org/2000/svg", "svg");
         svgNode.setAttributeNS(null, "viewBox", `0 0 ${box[0]} ${box[1]}`);
         svgNode.setAttributeNS(null, "width", box[0]);
@@ -199,7 +230,7 @@ export class Shape {
         const shapeNode = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
 
         // Scale the coordinates and then join
-        const scale = 0.16;
+        const scale = 0.18;
         const points = this.vertexArray.map( pt => pt.map( (c, i) => scale * (c - this.centroid[i]) +  box[i]/2).join() ).join(" ");
         shapeNode.setAttributeNS(null, "points", points);
         shapeNode.setAttributeNS(null, "fill", Shape.regularFillStyle);
